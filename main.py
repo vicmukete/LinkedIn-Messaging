@@ -20,8 +20,8 @@ driver_option = webdriver.ChromeOptions()
 
 # df = pd.read_csv('LinkedIn Stats')
 
-
-def login_questions(driver, email, password):
+# login function
+def login_info(driver, email, password):
     email_login = driver.find_element(By.ID, 'username')
     email_login.click()
     email_login.send_keys(email)
@@ -31,21 +31,26 @@ def login_questions(driver, email, password):
     password_login.send_keys(Keys.RETURN)
 
 
+# initialize webdriver
 def create_wb():
     service = Service(driver_path)
+    driver_option.add_argument('--start maximized')
     return webdriver.Chrome(service=service, options=driver_option)
 
 
+# terms to avoid
 def avoid_these_names():
+    key_words = []
     while True:
-        try:
-            names_to_avoid = input("Are there any specific name you'd like to avoid? (y or n): ").lower()
-            if names_to_avoid == 'y':
-                key_words = input("Enter key words to avoid: ")
-            elif names_to_avoid == 'n':
-                print('Ok :)')
-        except (SyntaxError, ValueError):
-            print('Please enter a valid response')
+        names_to_avoid = input("Are there any specific names/words you'd like to avoid? (y or n): ").lower()
+        if names_to_avoid == 'y':
+            key_word = input("Enter key words to avoid: ")
+            print()
+            key_words.append(key_word)
+            print(key_words)
+        elif names_to_avoid == 'n':
+            print('Ok :)')
+            return
 
 
 def create_csv(profile_data=None):
@@ -66,35 +71,29 @@ def create_csv(profile_data=None):
 
 
 def main():
-    # search = 'data science'
+    # primary information
+    search = 'data science'
     email = 'muketevictor6@gmail.com'
     password = 'DiboNtina80'
     print()
     # search = input('What jobs would you like to search for: ')
     # email = input('Enter LinkedIn email: ')
     # password = input('Enter LinkedIn Password: ')
+
+    # login process
     driver = create_wb()
     driver.get(f'https://www.linkedin.com/checkpoint/rm/sign-in-another-account?fromSignIn=true&trk=guest_homepage'
                f'-basic_nav-header-signin')
-    login_questions(driver, email, password)
-    try:
-        WebDriverWait(driver, 60).until(
-            ec.element_to_be_clickable((By.CLASS_NAME, 'btn__primary--large from__button--floating'))
-        )
-        signin_button = driver.find_element(By.CLASS_NAME, 'btn__primary--large from__button--floating')
-        signin_button.click()
+    login_info(driver, email, password)
 
-    except TimeoutException:
-        print('Timeout, waiting for button to load')
-    except (ElementNotInteractableException, ElementClickInterceptedException):
-        print('Error interacting with button')
-    time.sleep(10)
-    '''try:
+    # search process
+    try:
         WebDriverWait(driver, 2).until(
-            ec.element_to_be_clickable((By.CLASS_NAME, 'search-global-typehead_input'))
+            ec.element_to_be_clickable((By.XPATH, '//*[@id="global-nav-typeahead"]'))
         )
-        search_box = driver.find_element(By.CLASS_NAME, 'search-global-typehead_input')
+        search_box = driver.find_element(By.XPATH, '//*[@id="global-nav-typeahead"]')
         search_box.click()
+        time.sleep(5)
         search_box.send_keys(search)
         search_box.send_keys(Keys.RETURN)
 
@@ -102,7 +101,8 @@ def main():
         print('Timeout, waiting for search box to load')
     except (ElementNotInteractableException, ElementClickInterceptedException):
         print('Error interacting with search box')
-'''
+
+    driver.quit()
 
 
 main()
