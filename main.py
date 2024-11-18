@@ -31,6 +31,12 @@ def login_info(driver, email, password):
     password_login.send_keys(Keys.RETURN)
 
 
+def splitting_search(search):
+    if ' ' in search:
+        search = search.split()
+        print(search)
+
+
 # initialize webdriver
 def create_wb():
     service = Service(driver_path)
@@ -87,15 +93,17 @@ def main():
     login_info(driver, email, password)
 
     # search process
+
     try:
-        WebDriverWait(driver, 2).until(
+        WebDriverWait(driver, 5).until(
             ec.element_to_be_clickable((By.XPATH, '//*[@id="global-nav-typeahead"]'))
         )
-        search_box = driver.find_element(By.XPATH, '//*[@id="global-nav-typeahead"]')
-        search_box.click()
+        search_bar = driver.find_element(By.XPATH, '//*[@id="global-nav-typeahead"]')
+        search_bar.click()
         time.sleep(5)
-        search_box.send_keys(search)
-        search_box.send_keys(Keys.RETURN)
+        search_bar.send_keys(search)
+        # search_bar.send_keys(Keys.DOWN)
+        # search_bar.send_keys(Keys.RETURN)
 
     except TimeoutException:
         print('Timeout, waiting for search box to load')
