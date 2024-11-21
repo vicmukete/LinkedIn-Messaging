@@ -34,13 +34,14 @@ def login_info(driver, email, password):
 def splitting_search(search):
     if ' ' in search:
         search = search.split()
-        print(search)
+        return search
 
 
 # initialize webdriver
 def create_wb():
     service = Service(driver_path)
     driver_option.add_argument('--start maximized')
+    driver_option.add_argument('--disable-notifications')
     return webdriver.Chrome(service=service, options=driver_option)
 
 
@@ -60,7 +61,7 @@ def avoid_these_names():
 
 
 def create_csv(profile_data=None):
-    numOfData = 12
+    numOfData = 5
     file_exist = os.path.isfile('LinkedIn Stats')
 
     if profile_data is not None:
@@ -72,11 +73,26 @@ def create_csv(profile_data=None):
         with open("LinkedIn Stats", 'a', newline="") as csv_file:
             write = csv.writer(csv_file)
             if not file_exist:
-                write.writerow([])
+                write.writerow(['Name', 'Position', 'Company', 'Alma Mater', 'Connections'])
             write.writerow(data_write)
 
 
+def scraped_data(num, driver):
+    list_scraped = []
+    for index in range(1, num):
+        try:
+            WebDriverWait(driver, 10).until(
+                ec.element_to_be_clickable((By.XPATH, ''))
+            )
+        except TimeoutException:
+            print('Timeout, waiting for element to load.')
+        except (ElementNotInteractableException, ElementClickInterceptedException, NoSuchElementException,
+                WebDriverException):
+            print('Error interacting with element.')
+
+
 def main():
+    # login process
     # primary information
     search = 'data science'
     email = 'muketevictor6@gmail.com'
@@ -85,32 +101,65 @@ def main():
     # search = input('What jobs would you like to search for: ')
     # email = input('Enter LinkedIn email: ')
     # password = input('Enter LinkedIn Password: ')
+    '''try:
+        number_of_searches = int(input('How many companies do you want scraped: '))
+    except SyntaxError:
+        print('Please enter a valid integer')'''
 
-    # login process
+    var = splitting_search(search)
+
+    # handles <= 3 word searches
     driver = create_wb()
-    driver.get(f'https://www.linkedin.com/checkpoint/rm/sign-in-another-account?fromSignIn=true&trk=guest_homepage'
-               f'-basic_nav-header-signin')
-    login_info(driver, email, password)
+
+    if len(var) >= 3:
+        driver.get(
+            f'https://www.linkedin.com/search/results/all/?keywords={var[0]}%20{var[1]}%20{var[2]}&origin'
+            f'=GLOBAL_SEARCH_HEADER&sid=So%40')
+        login_info(driver, email, password)
+
+    elif len(var) == 2:
+        driver.get(
+            f'https://www.linkedin.com/search/results/all/?keywords={var[0]}%20{var[1]}&origin=GLOBAL_SEARCH_HEADER'
+            f'&sid=css')
+        login_info(driver, email, password)
+
+    else:
+        driver.get(f'https://www.linkedin.com/search/results/all/?keywords={var}&origin=GLOBAL_SEARCH_HEADER&sid=Jm6')
+        login_info(driver, email, password)
+
+    WebDriverWait(driver, 20).until(
+        ec.element_to_be_clickable((By.CLASS_NAME, 'artdeco-pill--choice'))
+    )
+    list_button_ppl = driver.find_element(By.CLASS_NAME, 'artdeco-pill--choice')
+    list_button_ppl.click()
+    time.sleep(10)
+
+    driver.quit()
 
     # search process
 
-    try:
-        WebDriverWait(driver, 5).until(
+
+'''    try:
+        WebDriverWait(driver, 20).until(
             ec.element_to_be_clickable((By.XPATH, '//*[@id="global-nav-typeahead"]'))
         )
         search_bar = driver.find_element(By.XPATH, '//*[@id="global-nav-typeahead"]')
         search_bar.click()
-        time.sleep(5)
         search_bar.send_keys(search)
-        # search_bar.send_keys(Keys.DOWN)
-        # search_bar.send_keys(Keys.RETURN)
+        search_bar.send_keys(Keys.RETURN)
 
     except TimeoutException:
         print('Timeout, waiting for search box to load')
-    except (ElementNotInteractableException, ElementClickInterceptedException):
+    except (ElementNotInteractableException, ElementClickInterceptedException, NoSuchElementException,
+            WebDriverException):
         print('Error interacting with search box')
 
-    driver.quit()
+    WebDriverWait(driver, 20).until(
+        ec.element_to_be_clickable((By.XPATH, '//*[@id="search-reusables__filters-bar"]'))
+    )
+    list_button_ppl = driver.find_element(By.XPATH, '//*[@id="search-reusables__filters-bar"]')
+    list_button_ppl.click()
 
+    driver.quit()'''
 
 main()
