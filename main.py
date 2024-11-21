@@ -77,18 +77,31 @@ def create_csv(profile_data=None):
             write.writerow(data_write)
 
 
-def scraped_data(num, driver):
-    list_scraped = []
+def scraped_data(driver, num):
+    scraped_names = []
+    scraped_job = []
+    scraped_company = []
+    scraped_alma_mater = []
     for index in range(1, num):
         try:
             WebDriverWait(driver, 10).until(
-                ec.element_to_be_clickable((By.XPATH, ''))
+                ec.element_to_be_clickable((By.XPATH, '//*[@id="KREEBDH0RqO+Bo3VCDNhyg=="]'))
             )
+            name_button = driver.find_element(By.XPATH, '//*[@id="KREEBDH0RqO+Bo3VCDNhyg=="]')
+            name_button.click()
         except TimeoutException:
             print('Timeout, waiting for element to load.')
         except (ElementNotInteractableException, ElementClickInterceptedException, NoSuchElementException,
                 WebDriverException):
             print('Error interacting with element.')
+        name = driver.find_element(By.XPATH, '//*[@id="ember1884"]').text
+        job = driver.find_element(By.CLASS_NAME, 'text-body-medium break-words').text  # also had profile-content XPATH
+        company = driver.find_element(By.XPATH, '//*[@id="profile-content"]').text
+        alma_mater = driver.find_element(By.XPATH, '//*[@id="profile-content"]').text
+        scraped_names.append(name)
+        scraped_job.append(job)
+        scraped_company.append(company)
+        scraped_alma_mater.append(alma_mater)
 
 
 def main():
