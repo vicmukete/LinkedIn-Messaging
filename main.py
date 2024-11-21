@@ -85,23 +85,25 @@ def scraped_data(driver, num):
     for index in range(1, num):
         try:
             WebDriverWait(driver, 10).until(
-                ec.element_to_be_clickable((By.XPATH, '//*[@id="KREEBDH0RqO+Bo3VCDNhyg=="]'))
+                ec.element_to_be_clickable((By.XPATH, '//*[@id="ElmHlwFPSv+rDaQOtP36fg=="]'))
             )
-            name_button = driver.find_element(By.XPATH, '//*[@id="KREEBDH0RqO+Bo3VCDNhyg=="]')
+            name_button = driver.find_element(By.XPATH, '//*[@id="ElmHlwFPSv+rDaQOtP36fg=="]')
             name_button.click()
+            time.sleep(5)
         except TimeoutException:
             print('Timeout, waiting for element to load.')
         except (ElementNotInteractableException, ElementClickInterceptedException, NoSuchElementException,
                 WebDriverException):
             print('Error interacting with element.')
-        name = driver.find_element(By.XPATH, '//*[@id="ember1884"]').text
-        job = driver.find_element(By.CLASS_NAME, 'text-body-medium break-words').text  # also had profile-content XPATH
+        name = driver.find_element(By.TAG_NAME, 'h1')
+        name.click()
+        '''job = driver.find_element(By.CLASS_NAME, 'text-body-medium break-words').text  # also had profile-content XPATH
         company = driver.find_element(By.XPATH, '//*[@id="profile-content"]').text
         alma_mater = driver.find_element(By.XPATH, '//*[@id="profile-content"]').text
         scraped_names.append(name)
         scraped_job.append(job)
         scraped_company.append(company)
-        scraped_alma_mater.append(alma_mater)
+        scraped_alma_mater.append(alma_mater)'''
 
 
 def main():
@@ -110,12 +112,13 @@ def main():
     search = 'data science'
     email = 'muketevictor6@gmail.com'
     password = 'DiboNtina80'
+    num = 100
     print()
     # search = input('What jobs would you like to search for: ')
     # email = input('Enter LinkedIn email: ')
     # password = input('Enter LinkedIn Password: ')
     '''try:
-        number_of_searches = int(input('How many companies do you want scraped: '))
+        num = int(input('How many companies do you want scraped: '))
     except SyntaxError:
         print('Please enter a valid integer')'''
 
@@ -146,6 +149,7 @@ def main():
     list_button_ppl = driver.find_element(By.CLASS_NAME, 'artdeco-pill--choice')
     list_button_ppl.click()
     time.sleep(10)
+    scraped_data(driver, num)
 
     driver.quit()
 
