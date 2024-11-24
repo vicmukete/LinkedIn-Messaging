@@ -51,8 +51,7 @@ def avoid_these_names():
     while True:
         names_to_avoid = input("Are there any specific names/words you'd like to avoid? (y or n): ").lower()
         if names_to_avoid == 'y':
-            key_word = input("Enter key words to avoid: ")
-            print()
+            key_word = input("Enter key words to avoid: \n")
             key_words.append(key_word)
             print(key_words)
         elif names_to_avoid == 'n':
@@ -73,7 +72,7 @@ def create_csv(profile_data=None):
         with open("LinkedIn Stats", 'a', newline="") as csv_file:
             write = csv.writer(csv_file)
             if not file_exist:
-                write.writerow(['Name', 'Position', 'Company', 'Alma Mater', 'Connections'])
+                write.writerow(['Name', 'Position', 'Company', 'Alma Mater', 'Experience'])
             write.writerow(data_write)
 
 
@@ -82,37 +81,39 @@ def scraped_data(driver, num):
     scraped_job = []
     scraped_company = []
     scraped_alma_mater = []
-    for index in range(1, num):
-        try:
-            WebDriverWait(driver, 10).until(
-                ec.element_to_be_clickable((By.XPATH, '//*[@id="ElmHlwFPSv+rDaQOtP36fg=="]'))
-            )
-            name_button = driver.find_element(By.XPATH, '//*[@id="ElmHlwFPSv+rDaQOtP36fg=="]')
-            name_button.click()
-            time.sleep(5)
-        except TimeoutException:
-            print('Timeout, waiting for element to load.')
-        except (ElementNotInteractableException, ElementClickInterceptedException, NoSuchElementException,
-                WebDriverException):
-            print('Error interacting with element.')
-        name = driver.find_element(By.TAG_NAME, 'h1')
-        name.click()
-        '''job = driver.find_element(By.CLASS_NAME, 'text-body-medium break-words').text  # also had profile-content XPATH
-        company = driver.find_element(By.XPATH, '//*[@id="profile-content"]').text
-        alma_mater = driver.find_element(By.XPATH, '//*[@id="profile-content"]').text
-        scraped_names.append(name)
-        scraped_job.append(job)
-        scraped_company.append(company)
-        scraped_alma_mater.append(alma_mater)'''
+    # for index in range(0, num):
+    # loop may be in the wrong place
+    try:
+        WebDriverWait(driver, 20).until(
+            ec.element_to_be_clickable((By.TAG_NAME, 'button'))
+        )
+        all_buttons = driver.find_element(By.TAG_NAME, 'button')
+        connect_buttons = [btn for btn in all_buttons if btn.text() == 'Connect']
+        connect_buttons[0].click()
+    except TimeoutException:
+        print('Timeout, waiting for element to load.')
+
+    except (ElementNotInteractableException, ElementClickInterceptedException, NoSuchElementException,
+            WebDriverException):
+        print('Error interacting with element.')
+
+
+    '''job = driver.find_element(By.CLASS_NAME, 'text-body-medium break-words').text  # also had profile-content XPATH
+    company = driver.find_element(By.XPATH, '//*[@id="profile-content"]').text
+    alma_mater = driver.find_element(By.XPATH, '//*[@id="profile-content"]').text
+    scraped_names.append(name)
+    scraped_job.append(job)
+    scraped_company.append(company)
+    scraped_alma_mater.append(alma_mater)'''
 
 
 def main():
     # login process
     # primary information
-    search = 'data science'
+    search = 'data science recruiter'
     email = 'muketevictor6@gmail.com'
     password = 'DiboNtina80'
-    num = 100
+    num = 2
     print()
     # search = input('What jobs would you like to search for: ')
     # email = input('Enter LinkedIn email: ')
